@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   dataWrapper: { marginTop: -1 },
   row: { height: 40, backgroundColor: "#E7E6E1" },
   textInput: { borderWidth: 1, borderColor: "grey", borderRadius: 8 },
-  addIssueButton: { marginTop: 16 },
+  submitButton: { marginTop: 16 },
   submitMessage: { textAlign: "center" },
 });
 const width = [40, 80, 80, 80, 80, 80, 200];
@@ -85,8 +85,6 @@ export function IssuesScreen() {
       <Text style={styles.screenHeading}>Issues</Text>
       <IssueFilter />
       <IssueTable issues={issues} />
-      {/****** Q4: Start Coding here. ******/}
-      {/****** Q4: Code Ends here. ******/}
     </ScrollView>
   );
 }
@@ -192,7 +190,11 @@ export function AddIssueScreen() {
           onChangeText={(text) => inputChange("effort", text)}
         />
         <Text>Due: {newIssue.due.toDateString()}</Text>
-        <Button title="Select a date" onPress={() => setShowDatePicker(true)} />
+        <Button
+          color="#608BC1"
+          title="Select a date"
+          onPress={() => setShowDatePicker(true)}
+        />
         {showDatePicker && (
           <DateTimePicker
             value={newIssue.due}
@@ -201,8 +203,8 @@ export function AddIssueScreen() {
             onChange={onDateChange}
           />
         )}
-        <View style={styles.addIssueButton}>
-          <Button title="Add issue" onPress={handleSubmit} />
+        <View style={styles.submitButton}>
+          <Button color="#133E87" title="Add issue" onPress={handleSubmit} />
         </View>
         {submitMessage && (
           <Text style={styles.submitMessage}>{submitMessage}</Text>
@@ -216,22 +218,42 @@ export function AddIssueScreen() {
 // Q4 - Blacklist
 // Q5 - Rendered on a separate screen
 export function BlacklistScreen() {
-  /****** Q4: Start Coding here. Create State to hold inputs******/
-  /****** Q4: Code Ends here. ******/
-  /****** Q4: Start Coding here. Add functions to hold/set state input based on changes in TextInput******/
-  /****** Q4: Code Ends here. ******/
+  const [newBlacklistOwner, setNewBlacklistOwner] = useState("");
+  const [submitMessage, setSubmitMessage] = useState("");
 
   async function handleSubmit() {
-    /****** Q4: Start Coding here. Create an issue from state variables and issue a query. Also, clear input field in front-end******/
-    /****** Q4: Code Ends here. ******/
+    Keyboard.dismiss();
+
+    const query = `mutation addToBlacklist($nameInput: String!) {
+      addToBlacklist(nameInput: $nameInput)
+    }`;
+
+    const data = await graphQLFetch(query, { nameInput: newBlacklistOwner });
+
+    if (data) {
+      // Using local state as server code returns
+      // the mutation with a null value
+      setSubmitMessage(`${newBlacklistOwner} added to blacklist`);
+      setNewBlacklistOwner("");
+    }
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.screenHeading}>Blacklist</Text>
-      <Text>Placeholder for Blacklist</Text>
-      {/****** Q4: Start Coding here. Create TextInput field, populate state variables. Create a submit button, and on submit, trigger handleSubmit.*******/}
-      {/****** Q4: Code Ends here. ******/}
+      <Text>Owner to Blacklist</Text>
+      <TextInput
+        style={styles.textInput}
+        keyboardType="default"
+        value={newBlacklistOwner}
+        onChangeText={(text) => setNewBlacklistOwner(text)}
+      />
+      <View style={styles.submitButton}>
+        <Button color="red" title="Blacklist" onPress={handleSubmit} />
+      </View>
+      {submitMessage && (
+        <Text style={styles.submitMessage}>{submitMessage}</Text>
+      )}
     </View>
   );
 }
