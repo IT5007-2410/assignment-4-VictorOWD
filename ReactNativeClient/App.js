@@ -10,24 +10,8 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { PaperProvider } from "react-native-paper";
 import { IssuesScreen, AddIssueScreen, BlacklistScreen } from "./IssueList.js";
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from "react-native";
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from "react-native/Libraries/NewAppScreen";
 
 /**
  * Q5 - Screen Navigation
@@ -39,7 +23,7 @@ function Tabs() {
     <Tab.Navigator
       initialRouteName="Issues"
       screenOptions={{
-        tabBarStyle: { backgroundColor: "#CBDCEB" },
+        tabBarStyle: { backgroundColor: "#133E87" },
         headerShown: false,
       }}
     >
@@ -92,8 +76,10 @@ function Tabs() {
 // App rewritten as function component
 export default function App() {
   return (
-    <NavigationContainer>
-      <Tabs />
-    </NavigationContainer>
+    <PaperProvider>
+      <NavigationContainer>
+        <Tabs />
+      </NavigationContainer>
+    </PaperProvider>
   );
 }

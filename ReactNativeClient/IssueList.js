@@ -2,33 +2,20 @@
   Additional dependencies are added to AwesomeProject
   See README.md in root directory
 */
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
+import { DataTable } from "react-native-paper";
+import DropDownPicker from "react-native-dropdown-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import {
-  Table,
-  TableWrapper,
-  Row,
-  Rows,
-  Col,
-  Cols,
-  Cell,
-} from "react-native-table-component";
-
-import {
-  SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TextInput,
   Button,
-  useColorScheme,
   View,
   Keyboard,
 } from "react-native";
-
-import DropDownPicker from "react-native-dropdown-picker";
-import DateTimePicker from "@react-native-community/datetimepicker";
 
 /**
  * Q5 - Styling
@@ -38,18 +25,48 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     flexDirection: "column",
-    backgroundColor: "#fff",
+    color: "#F3F3E0",
+    backgroundColor: "#CBDCEB",
   },
   screenHeading: { fontSize: 32, fontWeight: "bold", textAlign: "center" },
-  header: { height: 50, backgroundColor: "#537791" },
-  text: { textAlign: "center" },
-  dataWrapper: { marginTop: -1 },
-  row: { height: 40, backgroundColor: "#E7E6E1" },
-  textInput: { borderWidth: 1, borderColor: "grey", borderRadius: 8 },
+  dummyFilter: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    height: 40,
+  },
+  dummyFilterInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "grey",
+    borderRadius: 4,
+  },
+  dummyFilterButton: {
+    justifyContent: "center",
+  },
+  tableHeaderCell: { fontWeight: "bold" },
+  form: {
+    flexDirection: "column",
+    gap: 8,
+  },
+  textLabel: { fontWeight: "bold" },
+  textInput: {
+    borderWidth: 1,
+    borderColor: "grey",
+    borderRadius: 4,
+    height: 40,
+  },
+  dropdownPicker: {
+    backgroundColor: "#CBDCEB",
+    borderColor: "grey",
+    borderRadius: 4,
+    height: 40,
+    zIndex: 10,
+    marginBottom: 8,
+  },
   submitButton: { marginTop: 16 },
   submitMessage: { textAlign: "center" },
 });
-const width = [40, 80, 80, 80, 80, 80, 200];
 
 /*
   Screens
@@ -158,16 +175,17 @@ export function AddIssueScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.screenHeading}>Add Issue</Text>
-      <View>
-        <Text>Title</Text>
+      <View style={styles.form}>
+        <Text style={styles.textLabel}>Title</Text>
         <TextInput
           style={styles.textInput}
           keyboardType="default"
           value={newIssue.title}
           onChangeText={(text) => inputChange("title", text)}
         />
-        <Text>Status</Text>
+        <Text style={styles.textLabel}>Status</Text>
         <DropDownPicker
+          style={styles.dropdownPicker}
           open={dropdownOpen}
           value={dropdownValue}
           items={dropdownItems}
@@ -175,21 +193,21 @@ export function AddIssueScreen() {
           setValue={setDropdownValue}
           setItems={setDropdownItems}
         />
-        <Text>Owner</Text>
+        <Text style={styles.textLabel}>Owner</Text>
         <TextInput
           style={styles.textInput}
           keyboardType="default"
           value={newIssue.owner}
           onChangeText={(text) => inputChange("owner", text)}
         />
-        <Text>Effort</Text>
+        <Text style={styles.textLabel}>Effort</Text>
         <TextInput
           style={styles.textInput}
           keyboardType="number-pad"
           value={newIssue.effort}
           onChangeText={(text) => inputChange("effort", text)}
         />
-        <Text>Due: {newIssue.due.toDateString()}</Text>
+        <Text style={styles.textLabel}>Due: {newIssue.due.toDateString()}</Text>
         <Button
           color="#608BC1"
           title="Select a date"
@@ -240,20 +258,22 @@ export function BlacklistScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.screenHeading}>Blacklist</Text>
-      <Text>Owner to Blacklist</Text>
-      <TextInput
-        style={styles.textInput}
-        keyboardType="default"
-        value={newBlacklistOwner}
-        onChangeText={(text) => setNewBlacklistOwner(text)}
-      />
-      <View style={styles.submitButton}>
-        <Button color="red" title="Blacklist" onPress={handleSubmit} />
+      <View style={styles.form}>
+        <Text style={styles.screenHeading}>Blacklist</Text>
+        <Text style={styles.textLabel}>Owner to Blacklist</Text>
+        <TextInput
+          style={styles.textInput}
+          keyboardType="default"
+          value={newBlacklistOwner}
+          onChangeText={(text) => setNewBlacklistOwner(text)}
+        />
+        <View style={styles.submitButton}>
+          <Button color="red" title="Blacklist" onPress={handleSubmit} />
+        </View>
+        {submitMessage && (
+          <Text style={styles.submitMessage}>{submitMessage}</Text>
+        )}
       </View>
-      {submitMessage && (
-        <Text style={styles.submitMessage}>{submitMessage}</Text>
-      )}
     </View>
   );
 }
@@ -264,8 +284,15 @@ export function BlacklistScreen() {
 // Q1 - Dummy Issue Filter (rewritten as function component)
 function IssueFilter() {
   return (
-    <View>
-      <Text>Dummy Issue Filter</Text>
+    <View style={styles.dummyFilter}>
+      <TextInput
+        style={styles.dummyFilterInput}
+        placeholder="Filter by..."
+        editable={false}
+      />
+      <View style={styles.dummyFilterButton}>
+        <Button color="#608BC1" title="go" disabled={true} />
+      </View>
     </View>
   );
 }
@@ -276,43 +303,65 @@ function IssueTable({ issues }) {
   const issueRows = issues ? (
     issues.map((issue) => <IssueRow key={issue.id} issue={issue} />)
   ) : (
-    <Row>
-      <Cell data="No issues yet" colSpan={tableHeaders.length}></Cell>
-    </Row>
+    <DataTable.Row>
+      <DataTable.Cell>No issues yet.</DataTable.Cell>
+    </DataTable.Row>
   );
 
-  const tableHeaders = [
-    "ID",
-    "Title",
-    "Status",
-    "Owner",
-    "Created",
-    "Effort",
-    "Due",
-  ];
-
   return (
-    <View style={styles.container}>
-      <Table>
-        <Row data={tableHeaders} />
-        {issueRows}
-      </Table>
-    </View>
+    <DataTable>
+      <DataTable.Header>
+        <DataTable.Title textStyle={styles.tableHeaderCell}>ID</DataTable.Title>
+        <DataTable.Title textStyle={styles.tableHeaderCell}>
+          Title
+        </DataTable.Title>
+        <DataTable.Title textStyle={styles.tableHeaderCell}>
+          Status
+        </DataTable.Title>
+        <DataTable.Title textStyle={styles.tableHeaderCell}>
+          Owner
+        </DataTable.Title>
+        <DataTable.Title textStyle={styles.tableHeaderCell}>
+          Created
+        </DataTable.Title>
+        <DataTable.Title textStyle={styles.tableHeaderCell}>
+          Effort
+        </DataTable.Title>
+        <DataTable.Title textStyle={styles.tableHeaderCell}>
+          Due
+        </DataTable.Title>
+      </DataTable.Header>
+      {issueRows}
+    </DataTable>
   );
 }
 
 // Q2 - Each row
 function IssueRow({ issue }) {
   // null & Date object handling
-  const rowData = Object.values(issue).map((value) => {
-    if (!value) return "N/A";
-    if (value instanceof Date) {
-      return value.toDateString();
+  const cells = Object.entries(issue).map(([key, value]) => {
+    if (!value) {
+      return (
+        <DataTable.Cell key={key}>
+          <Text>N/A</Text>
+        </DataTable.Cell>
+      );
     }
-    return String(value);
+    if (value instanceof Date) {
+      return (
+        <DataTable.Cell key={key}>
+          <Text>{value.toDateString()}</Text>
+        </DataTable.Cell>
+      );
+    }
+    return (
+      <DataTable.Cell key={key}>
+        <Text>{String(value)}</Text>
+      </DataTable.Cell>
+    );
   });
 
-  return <Row data={rowData} />;
+  return <DataTable.Row>{cells}</DataTable.Row>;
 }
 
 /**

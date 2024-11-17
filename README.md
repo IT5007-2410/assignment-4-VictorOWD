@@ -2,7 +2,6 @@
 
 These dependencies are added to the initial template provided:
 
-- `react-native-table-component` (from initial template)
 - `@react-navigation/native`
 - `@react-navigation/bottom-tabs`
 - `react-native-screens`
@@ -10,11 +9,12 @@ These dependencies are added to the initial template provided:
 - `react-native-vector-icons`
 - `react-native-dropdown-picker`
 - `@react-native-community/datetimepicker`
+- `react-native-paper`
 
 Install dependencies in `/AwesomeProject`:
 
 ```
-npm install -save react-native-table-component @react-navigation/native @react-navigation/bottom-tabs react-native-screens react-native-safe-area-context react-native-vector-icons react-native-dropdown-picker @react-native-community/datetimepicker
+npm install -save @react-navigation/native @react-navigation/bottom-tabs react-native-screens react-native-safe-area-context react-native-vector-icons react-native-dropdown-picker @react-native-community/datetimepicker react-native-paper
 ```
 
 # Additional Configurations
